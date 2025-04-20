@@ -3,7 +3,18 @@ import Appointment from "../models/appointment.model.js";
 // Create a new appointment
 export async function createAppointment(req, res) {
     try {
-        const newAppointment = new Appointment(req.body);
+        // Find the highest existing appointmentID
+        const lastAppointment = await Appointment.findOne().sort({ appointmentID: -1 });
+        const nextAppointmentID = lastAppointment ? lastAppointment.appointmentID + 1 : 100; // Default start at 100
+
+        // Create a new appointment with the next ID
+        const newAppointment = new Appointment({
+            ...req.body,
+            appointmentID: nextAppointmentID,
+            createdAt: new Date(),
+            updatedAt: new Date()
+        });
+
         await newAppointment.save();
         res.status(201).json(newAppointment);
     } catch (error) {
