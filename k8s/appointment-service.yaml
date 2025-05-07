@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: microservice1-appointment-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: microservice1-appointment-service
+  template:
+    metadata:
+      labels:
+        app: microservice1-appointment-service
+    spec:
+      containers:
+        - name: microservice1-appointment-service
+          image: microservice1-appointment-service:local
+          ports:
+            - containerPort: 5000
+          env:
+            - name: MONGODB_URI
+              value: "mongodb+srv://aikanshboyal:aikanshiscool@cluster0.yicdivk.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+            - name: PORT
+              value: "5000"
+            - name: USER_SERVICE_URL
+              value: "http://microservice3-user-service:3000"
+            - name: DOCTOR_SERVICE_URL
+              value: "http://microservice4-doctor-service:8080"
+            - name: NOTIFICATION_SERVICE_URL
+              value: "http://microservice2-notification-service:8080"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: microservice1-appointment-service
+spec:
+  selector:
+    app: microservice1-appointment-service
+  ports:
+    - port: 80
+      targetPort: 5000
+  type: NodePort
